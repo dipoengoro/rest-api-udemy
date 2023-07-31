@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const feedRoutes = require("./routes/feed");
+const authRoutes = require("./routes/auth");
 const bodyParser = require("body-parser");
 const app = express();
 const mongoose = require("mongoose");
@@ -27,7 +28,7 @@ const fileFilter = (req, file, callback) => {
 
 app.use(bodyParser.json());
 app.use(multer({
-  storage   : fileStorage,
+  storage: fileStorage,
   fileFilter: fileFilter
 }).single("image"));
 app.use("/images", express.static(path.join(__dirname, "images")));
@@ -40,10 +41,15 @@ app.use((req, res, next) => {
 });
 
 app.use("/feed", feedRoutes);
+app.use("/auth", authRoutes);
 app.use((e, req, res, next) => {
   const status = e.statusCode || 500;
   const message = e.message;
-  res.status(status).json({message: message});
+  const data = e.data;
+  res.status(status).json({
+    message: message,
+    data   : data
+  });
 });
 
 mongoose.connect(process.env.MONGODB_URI)
