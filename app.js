@@ -28,7 +28,7 @@ const fileFilter = (req, file, callback) => {
 
 app.use(bodyParser.json());
 app.use(multer({
-  storage: fileStorage,
+  storage   : fileStorage,
   fileFilter: fileFilter
 }).single("image"));
 app.use("/images", express.static(path.join(__dirname, "images")));
@@ -52,6 +52,9 @@ app.use((e, req, res, next) => {
   });
 });
 
-mongoose.connect(process.env.MONGODB_URI)
-        .then(() => app.listen(process.env.PORT))
-        .catch(e => console.log(e));
+try {
+  mongoose.connect(process.env.MONGODB_URI);
+  app.listen(process.env.PORT);
+} catch (e) {
+  console.log(e);
+}
